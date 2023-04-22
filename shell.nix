@@ -11,5 +11,5 @@ mkShell {
     redis
     nixpkgs-fmt
     rust-dev-toolchain
-  ] ++ lib.lists.optionals pkgs.stdenv.isDarwin [ darwin.apple_sdk.frameworks.Foundation ];
+  ] ++ lib.lists.optionals pkgs.stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ];
 }

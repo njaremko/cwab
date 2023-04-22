@@ -47,7 +47,7 @@
           commonNativeBuildInputs = with pkgs; [
             openssl
             pkg-config
-          ];
+          ] ++ lib.lists.optionals pkgs.stdenv.isDarwin [ darwin.apple_sdk.frameworks.Security ];
           src = craneLib.cleanCargoSource (craneLib.path ./.);
           commonArgs = {
             inherit src;
