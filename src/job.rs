@@ -20,6 +20,9 @@ pub enum Backoff {
 
     /// Waits duration before retrying, then waits twice as long, then twice more, etc...
     Exponential(Duration),
+
+    /// We use the same backoff algorithm as Sidekiq: (retry_count^4) + 15 + (rand(10) * (retry_count + 1))
+    Default,
 }
 
 /// Retry policy for jobs
@@ -230,7 +233,10 @@ pub trait Job: Send + Sync + 'static + DynClone + std::fmt::Debug {
 
     /// Allows you to specify whether this job should be retries, and if so, how many times
     fn retry_policy(&self) -> Option<RetryPolicy> {
-        None
+        Some(RetryPolicy::Count {
+            backoff: Backoff::Default,
+            count: 25,
+        })
     }
 
     /// Allows you to define how long after a job has after it is created to get picked up by a worker.

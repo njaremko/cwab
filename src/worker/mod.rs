@@ -8,6 +8,7 @@ use crate::{Config, MAX_WAIT};
 use anyhow::anyhow;
 use async_trait::async_trait;
 use futures::{join, FutureExt};
+use rand::Rng;
 use signal_hook::consts::TERM_SIGNALS;
 use signal_hook::flag;
 use std::collections::{HashMap, HashSet};
@@ -137,7 +138,14 @@ pub(super) async fn enqueue_retry_work<W: WorkerExt + InternalWorkerExt>(
     let client = w.client();
     let q = client.pop_job(Queue::Retrying, namespace)?;
     if let Some(mut job) = q {
-        let mut apply_backoff = |backoff| match backoff {
+        let mut apply_backoff = |retry_count: u64, backoff| match backoff {
+            Backoff::Default => {
+                let mut rng = rand::thread_rng();
+                let rand_int: u64 = rng.gen_range(0..10);
+                let duration =
+                    Duration::from_secs(retry_count.pow(4) + 15 + (rand_int * (retry_count + 1)));
+                job.at = Some(OffsetDateTime::now_utc() + duration);
+            }
             Backoff::Linear(d) => {
                 job.at = Some(OffsetDateTime::now_utc() + d);
             }
@@ -153,14 +161,14 @@ pub(super) async fn enqueue_retry_work<W: WorkerExt + InternalWorkerExt>(
         match job.retry_policy {
             Some(RetryPolicy::Forever { backoff }) => Ok({
                 job.retry = Some(retry_count + 1);
-                apply_backoff(backoff);
+                apply_backoff(retry_count as u64, backoff);
                 let res = w.client().raw_push(&[job]).await?;
                 Some(res[0])
             }),
             Some(RetryPolicy::Count { count, backoff }) => {
                 if retry_count < count - 1 {
                     job.retry = Some(retry_count + 1);
-                    apply_backoff(backoff);
+                    apply_backoff(retry_count as u64, backoff);
                     let res = w.client().raw_push(&[job]).await?;
                     Ok(Some(res[0]))
                 } else {
