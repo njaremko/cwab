@@ -87,7 +87,7 @@ async fn main() -> Result<()> {
     let config = Config::new(None)?;
     let cwab = Cwab::new(&config)?;
     let mut worker = cwab.worker();
-    worker.register(HelloJob)?;
+    worker.register(HelloJob);
 
     cwab.perform_async(HelloJob, None)
         .await

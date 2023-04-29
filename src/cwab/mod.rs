@@ -23,7 +23,7 @@ pub struct Cwab {
 impl Cwab {
     /// Creates a new instance of Cwab
     pub fn new(config: &Config) -> Result<Cwab, CwabError> {
-        let redis_pool: Pool<redis::Client> = establish(&config)?;
+        let redis_pool: Pool<redis::Client> = establish(config)?;
         let client = CwabClient::new(redis_pool);
         Ok(Cwab {
             worker: Worker::new(client.clone())?,
@@ -174,7 +174,7 @@ impl CwabExt for Cwab {
             .map(|input| {
                 let j = job.clone();
                 let (job, input) = apply_client_middleware(&self.middleware, j, input.clone());
-                job.to_job_description(self.encode_input(input.clone()))
+                job.to_job_description(self.encode_input(input))
             })
             .collect();
 
