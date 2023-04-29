@@ -21,7 +21,7 @@ use tokio::task::JoinHandle;
 #[async_trait]
 pub trait WorkerExt {
     /// Registers a job as workable by this worker. All job types must be registered before you start the worker.
-    fn register(&mut self, job: impl Job + Copy) -> Result<(), CwabError>;
+    fn register(&mut self, job: impl Job + Copy);
     /// Returns a map of job names to job instances
     fn registered_jobs(&self) -> &HashMap<String, Box<dyn Job>>;
     /// Given a namespace, pops a job off of the work queue, if available

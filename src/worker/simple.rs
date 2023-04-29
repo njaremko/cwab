@@ -82,11 +82,10 @@ impl InternalWorkerExt for SimpleWorker {
 
 #[async_trait]
 impl WorkerExt for SimpleWorker {
-    fn register(&mut self, job: impl Job) -> Result<(), CwabError> {
+    fn register(&mut self, job: impl Job + Copy) {
         self.0
             .registered_jobs
             .insert(job.name().to_string(), Box::new(job));
-        Ok(())
     }
 
     fn registered_jobs(&self) -> &HashMap<String, Box<dyn Job>> {

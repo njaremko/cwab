@@ -1,7 +1,7 @@
 [package]
 name = "cwab"
 authors = ["Nathan Jaremko <nathan@jaremko.ca>"]
-version = "0.5.2"
+version = "0.5.3"
 edition = "2021"
 description = "A correct, efficient, and simple job processor"
 license = "LGPL-3.0"
