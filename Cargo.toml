@@ -1,12 +1,12 @@
 [package]
 name = "cwab"
 authors = ["Nathan Jaremko <nathan@jaremko.ca>"]
-version = "0.5.0"
+version = "0.5.1"
 edition = "2021"
 description = "A correct, efficient, and simple job processor"
 license = "LGPL-3.0"
 readme = "README.md"
-keywords = ["job", "processor", "queue", "worker"]
+keywords = ["job", "processor", "queue", "worker", "sidekiq", "resque", "oban", "background", "processing"]
 repository = "https://github.com/cwabcorp/cwab"
 categories = []
 
