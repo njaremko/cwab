@@ -1,3 +1,11 @@
+# 0.5.4
+
+- Just a small documentation and README change
+
+# 0.5.3
+
+- Changed registering jobs to not return a result. It can't fail.
+
 # 0.5.2
 - Published the `ClientMiddleware` trait
 
