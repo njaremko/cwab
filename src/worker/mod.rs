@@ -304,9 +304,23 @@ pub(super) async fn start_working<
         .map(|v| v.queue())
         .collect();
 
-    let queue_task = worker.run_workers(worker.term_bool(), worker.clone(), &namespaces);
+    let loop_term = worker.term_bool();
+    let dying_task = tokio::spawn(async move {
+        loop {
+            if loop_term.load(Ordering::Relaxed) {
+                println!("Shutting down...");
+                break;
+            }
+            tokio::time::sleep(Duration::from_millis(100)).await;
+        }
+    });
 
-    join!(queue_task);
+    println!("Starting worker");
+    let queue_task = worker
+        .run_workers(worker.term_bool(), worker.clone(), &namespaces)
+        .await;
+
+    let (_, _) = join!(queue_task, dying_task);
     Ok(())
 }
 

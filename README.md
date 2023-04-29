@@ -47,59 +47,5 @@ Use the below links to purchase a commercial license. You'll receive access to C
 
 You can find our documentation [here](https://github.com/cwabcorp/cwab/wiki)
 
-# Basic use
-
-Below is a basic implementation of a worker.
-
-This example includes scheduling some jobs before starting the worker, which you would usually do on another machine.
-
-To run, you'd run `cwab librarian start` in a separate shell to start the bookkeeping worker, and then run `cargo run` in your project.
-
-```rust
-use anyhow::Result;
-use async_trait::async_trait;
-use cwab::prelude::*;
-use serde::{Deserialize, Serialize};
-
-#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
-pub struct HelloJob;
-
-#[async_trait]
-impl Job for HelloJob {
-    fn name(&self) -> &'static str {
-        "HelloJob"
-    }
-
-    async fn perform(&self, input: Option<String>) -> Result<Option<String>, JobError> {
-        let to_print = if let Some(i) = input {
-            format!("Hello {:?}", i)
-        } else {
-             format!("Hello World")
-        };
-        println!("{}", to_print);
-        Ok(None)
-    }
-}
-
-
-#[tokio::main]
-async fn main() -> Result<()> {
-    let config = Config::new(None)?;
-    let cwab = Cwab::new(&config)?;
-    let mut worker = cwab.worker();
-    worker.register(HelloJob);
-
-    cwab.perform_async(HelloJob, None)
-        .await
-        .expect("Failed to schedule job");
-    cwab.perform_async(HelloJob, Some("Bob".to_string()))
-        .await
-        .expect("Failed to schedule job");
-
-    worker.start().await.expect("An unexpected error occurred");
-    Ok(())
-}
-```
-
 # Contributing
 If you want to contribute, I recommend looking at our [good first issues](https://github.com/cwabcorp/cwab/contribute). Our [contributing file](.github/CONTRIBUTING.md) has some tips for getting started.

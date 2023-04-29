@@ -65,6 +65,9 @@ impl InternalWorkerExt for SimpleWorker {
         let queue_task_namespaces = queue_task_namespaces.clone();
         tokio::spawn(async move {
             'outer: loop {
+                if term_bool.load(Ordering::Relaxed) {
+                    break 'outer;
+                }
                 for namespace in &queue_task_namespaces {
                     if term_bool.load(Ordering::Relaxed) {
                         break 'outer;
