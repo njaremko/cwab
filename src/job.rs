@@ -94,6 +94,7 @@ impl FromStr for Queue {
 /// This is a thin wrapper around `anyhow::Error` to allow us to swap out the underlying error type someday, if needed
 #[derive(Error, Debug)]
 pub enum JobError {
+    /// A string wrapper for panics that occur
     #[error("A panic occurred in the job")]
     PanicError { panic: String },
     /// This is a thin wrapper around `anyhow::Error` to allow us to swap out the underlying error type someday, if needed
