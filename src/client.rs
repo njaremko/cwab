@@ -256,8 +256,8 @@ impl CwabClient {
         pipe.lrem(Queue::Working.namespaced(&job.namespace), 1, job);
 
         match to {
-            Queue::Complete => {
-                pipe.sadd(Queue::Complete.namespaced(&job.namespace), job);
+            Queue::Processed => {
+                pipe.sadd(Queue::Processed.namespaced(&job.namespace), job);
             }
             Queue::Retrying => {
                 let mut new_job = job.clone();

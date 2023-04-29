@@ -46,7 +46,7 @@ pub enum Queue {
     /// A list of jobs that are being retried according to their backoff strategy
     Retrying,
     /// A list of successfully completed jobs
-    Complete,
+    Processed,
     /// A list of dead jobs, that will be reaped in 30 days
     Dead,
 }
@@ -66,7 +66,7 @@ impl Display for Queue {
             Queue::Failed => "failed",
             Queue::Working => "working",
             Queue::Retrying => "retrying",
-            Queue::Complete => "complete",
+            Queue::Processed => "processed",
             Queue::Dead => "dead",
         };
         f.write_str(s)
@@ -84,7 +84,7 @@ impl FromStr for Queue {
             "failed" => Ok(Queue::Failed),
             "working" => Ok(Queue::Working),
             "retrying" => Ok(Queue::Retrying),
-            "complete" => Ok(Queue::Complete),
+            "processed" => Ok(Queue::Processed),
             "dead" => Ok(Queue::Dead),
             _ => Err(anyhow!("NO!")),
         }

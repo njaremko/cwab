@@ -387,7 +387,7 @@ pub(crate) async fn do_work<W: WorkerExt + InternalWorkerExt>(
         Ok(r) => match r {
             Ok(_) => {
                 w.client()
-                    .change_status(&job_description, Queue::Complete)
+                    .change_status(&job_description, Queue::Processed)
                     .expect("INVARIANT VIOLATED: Failed to change status");
             }
             Err(_) => handle_error(),
