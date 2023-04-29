@@ -45,7 +45,7 @@ pub enum Queue {
     Working,
     /// A list of jobs that are being retried according to their backoff strategy
     Retrying,
-    /// A list of successfully completed jobs
+    /// A list of successfully processed jobs
     Processed,
     /// A list of dead jobs, that will be reaped in 30 days
     Dead,
@@ -94,6 +94,8 @@ impl FromStr for Queue {
 /// This is a thin wrapper around `anyhow::Error` to allow us to swap out the underlying error type someday, if needed
 #[derive(Error, Debug)]
 pub enum JobError {
+    #[error("A panic occurred in the job")]
+    PanicError { panic: String },
     /// This is a thin wrapper around `anyhow::Error` to allow us to swap out the underlying error type someday, if needed
     #[error(transparent)]
     AnyError(#[from] anyhow::Error),

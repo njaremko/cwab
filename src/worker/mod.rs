@@ -5,6 +5,7 @@ use crate::prelude::{
     Backoff, CwabError, Job, JobDescription, JobError, JobId, Queue, RetryPolicy,
 };
 use crate::{Config, MAX_WAIT};
+use anyhow::anyhow;
 use async_trait::async_trait;
 use futures::{join, FutureExt};
 use signal_hook::consts::TERM_SIGNALS;
@@ -343,11 +344,16 @@ async fn wrapped_platform<W: WorkerExt + InternalWorkerExt>(
     w: &W,
     job_description: &JobDescription,
     job_input: Option<String>,
-) -> Result<Result<Option<String>, JobError>, Box<dyn std::any::Any + std::marker::Send>> {
+) -> Result<Option<String>, JobError> {
     let job = w
         .registered_jobs()
         .get(&job_description.job_type)
-        .expect("INVARIANT VIOLATED: Reserved work that we can't do!");
+        .ok_or_else(|| {
+            anyhow!(
+                "INVARIANT VIOLATED: Reserved work that we can't do!\n{:?}",
+                job_description
+            )
+        })?;
 
     // Send a heartbeat while the job runs
     let heartbeat = start_heartbeat(w, job_description);
@@ -358,7 +364,13 @@ async fn wrapped_platform<W: WorkerExt + InternalWorkerExt>(
 
     // Kill the heartbeat
     heartbeat.abort();
-    result
+
+    match result {
+        Ok(success) => success,
+        Err(panic) => Err(JobError::PanicError {
+            panic: format!("{:?}", panic),
+        }),
+    }
 }
 
 pub(crate) async fn do_work<W: WorkerExt + InternalWorkerExt>(
@@ -384,14 +396,11 @@ pub(crate) async fn do_work<W: WorkerExt + InternalWorkerExt>(
         }
     };
     match &result {
-        Ok(r) => match r {
-            Ok(_) => {
-                w.client()
-                    .change_status(&job_description, Queue::Processed)
-                    .expect("INVARIANT VIOLATED: Failed to change status");
-            }
-            Err(_) => handle_error(),
-        },
+        Ok(_job_output) => {
+            w.client()
+                .change_status(&job_description, Queue::Processed)
+                .expect("INVARIANT VIOLATED: Failed to change status");
+        }
         Err(_) => handle_error(),
     }
     Ok(())
