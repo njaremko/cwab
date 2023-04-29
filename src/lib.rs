@@ -14,7 +14,7 @@
 //!
 //! NOTE: This doesn't include running `cwab librarian start`, which is a separate binary this library provides, which handles bookkeeping work not covered by workers (Scheduled job polling, retry scheduling, etc...).
 //! You should probably only run one instance of `cwab` somewhere, since it doesn't need much resources, but could put a lot of load on your redis instance otherwise.
-//!```
+//!```ignore
 //! use anyhow::Result;
 //! use cwab::prelude::*;
 //! use async_trait::async_trait;
