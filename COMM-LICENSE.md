@@ -40,7 +40,7 @@ under the terms of the GNU Lesser General Public License version 3.0
 
 5. Fees and Payment. The Software license fees will be due and payable in full as set forth in the applicable invoice or at the time of purchase. If the Software does not function properly within two weeks of purchase, please contact us within those two weeks for a refund. You shall be responsible for all taxes, withholdings, duties and levies arising from the order (excluding taxes based on the net income of First Kind Software Inc).
 
-6. Support, Maintenance and Services. Subject to the terms and conditions of this Agreement, as set forth in your invoice, and as set forth on the Cwab Pro support page (https://github.com/cwabco/cwab/wiki/Commercial-Support), support and maintenance services may be included with the purchase of your license subscription.
+6. Support, Maintenance and Services. Subject to the terms and conditions of this Agreement, as set forth in your invoice, and as set forth on the Cwab Pro support page (https://github.com/cwabcorp/cwab/wiki/Commercial-Support), support and maintenance services may be included with the purchase of your license subscription.
 
 7. Term of Agreement.
 
@@ -76,7 +76,7 @@ In no event will First Kind Software Inc' liability exceed the Software license 
 
 13.1 Entire Agreement. This Agreement sets forth our entire agreement with respect to the Software and the subject matter hereof and supersedes all prior and contemporaneous understandings and agreements whether written or oral.
 
-13.2 Amendment. First Kind Software Inc reserves the right, in its sole discretion, to amend this Agreement from time. Amendments to this Agreement can be located at: https://github.com/cwabco/cwab/blob/main/COMM-LICENSE.
+13.2 Amendment. First Kind Software Inc reserves the right, in its sole discretion, to amend this Agreement from time. Amendments to this Agreement can be located at: https://github.com/cwabcorp/cwab/blob/main/COMM-LICENSE.
 
 13.3 Assignment. You may not assign this Agreement or any of its rights under this Agreement without the prior written consent of First Kind Software Inc and any attempted assignment without such consent shall be void.
 
