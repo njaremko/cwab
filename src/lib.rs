@@ -50,13 +50,11 @@
 //!     worker.register(HelloJob);
 //!
 //!     cwab.perform_async(HelloJob, None)
-//!         .await
-//!         .expect("Failed to schedule job");
+//!         .await?;
 //!     cwab.perform_async(HelloJob, Some("Bob".to_string()))
-//!         .await
-//!         .expect("Failed to schedule job");
+//!         .await?;
 //!
-//!     worker.start_working().await.expect("An unexpected error occurred");
+//!     worker.start_working().await?;
 //!     Ok(())
 //! }
 //!```
