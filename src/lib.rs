@@ -82,6 +82,8 @@ pub struct Config {
     version: usize,
     /// A `redis://...` url
     redis_url: String,
+    /// A secret used to encrypt job inputs
+    secret: Option<String>,
 }
 
 impl Config {
@@ -91,19 +93,21 @@ impl Config {
         let config = if path.exists() {
             toml::from_str::<Config>(std::str::from_utf8(&std::fs::read(path_str)?)?)?
         } else {
-            println!("No config file found, falling back to REDIS_URL");
-            match std::env::var("REDIS_URL") {
-                Ok(redis_url) => Config {
-                    version: 1,
-                    redis_url,
-                },
-                _ => {
-                    println!("REDIS_URL is not set, falling back to redis://127.0.0.1:6379");
-                    Config {
-                        version: 1,
-                        redis_url: "redis://127.0.0.1:6379".to_string(),
-                    }
-                }
+            println!("No config file found, falling back to ENV vars");
+            let redis_url = std::env::var("REDIS_URL").unwrap_or_else(|_| {
+                println!("REDIS_URL is not set, falling back to redis://127.0.0.1:6379");
+                "redis://127.0.0.1:6379".to_string()
+            });
+
+            let secret = std::env::var("CWAB_SECRET").ok();
+            if secret.is_none() {
+                println!("CWAB_SECRET is not set, disabling encryption");
+            }
+
+            Config {
+                version: 1,
+                redis_url,
+                secret,
             }
         };
         Ok(config)

@@ -29,7 +29,7 @@ pub enum CwabClientError {
 
 #[derive(Clone, Debug)]
 pub struct CwabClient {
-    redis_pool: r2d2::Pool<redis::Client>,
+    pub(crate) redis_pool: r2d2::Pool<redis::Client>,
 }
 
 impl CwabClient {
