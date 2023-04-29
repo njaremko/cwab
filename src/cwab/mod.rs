@@ -37,6 +37,7 @@ impl Cwab {
         self.worker.clone()
     }
 
+    /// Register middleware applied to all jobs
     pub fn register_middleware(&mut self, middleware: Box<dyn ClientMiddleware>) {
         self.middleware.push(middleware);
     }
@@ -45,6 +46,7 @@ impl Cwab {
 /// Middleware that transforms a job and input into another job and input
 #[async_trait]
 pub trait ClientMiddleware: Send + Sync + DynClone {
+    /// Transform a given job and input into another job and input
     fn transform(
         &self,
         from: Box<dyn Job>,
