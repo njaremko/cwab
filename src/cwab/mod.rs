@@ -41,8 +41,8 @@ impl Cwab {
     }
 
     /// Register middleware applied to all jobs
-    pub fn register_middleware(&mut self, middleware: Box<dyn ClientMiddleware>) {
-        self.middleware.push(middleware);
+    pub fn register_middleware(&mut self, middleware: impl ClientMiddleware + 'static) {
+        self.middleware.push(Box::new(middleware));
     }
 }
 
