@@ -1,3 +1,6 @@
+# 0.5.2
+- Published the `ClientMiddleware` trait
+
 # 0.5.0
 
 ### Launching Cwab Pro
