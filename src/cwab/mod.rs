@@ -15,6 +15,8 @@ use thiserror::Error;
 /// dispatching of work to the various queues.
 #[derive(Clone)]
 pub struct Cwab {
+    #[allow(dead_code)]
+    config: Config,
     client: CwabClient,
     worker: Worker,
     middleware: Vec<Box<dyn ClientMiddleware>>,
@@ -26,7 +28,8 @@ impl Cwab {
         let redis_pool: Pool<redis::Client> = establish(config)?;
         let client = CwabClient::new(redis_pool);
         Ok(Cwab {
-            worker: Worker::new(client.clone())?,
+            config: config.clone(),
+            worker: Worker::new(config, client.clone())?,
             middleware: vec![],
             client,
         })

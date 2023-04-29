@@ -2,6 +2,7 @@ use crate::{
     client::CwabClient,
     job::{Job, JobDescription, JobInput},
     prelude::CwabError,
+    Config,
 };
 use async_trait::async_trait;
 use std::{
@@ -21,8 +22,8 @@ use super::{InternalWorkerExt, Worker, WorkerExt, MAX_WAIT};
 pub struct SimpleWorker(Worker);
 
 impl SimpleWorker {
-    pub(crate) fn new(client: CwabClient) -> Result<Self, anyhow::Error> {
-        Ok(SimpleWorker(Worker::new(client)?))
+    pub(crate) fn new(config: &Config, client: CwabClient) -> Result<Self, anyhow::Error> {
+        Ok(SimpleWorker(Worker::new(config, client)?))
     }
 }
 

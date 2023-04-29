@@ -4,7 +4,7 @@ use crate::client::CwabClient;
 use crate::prelude::{
     Backoff, CwabError, Job, JobDescription, JobError, JobId, Queue, RetryPolicy,
 };
-use crate::MAX_WAIT;
+use crate::{Config, MAX_WAIT};
 use async_trait::async_trait;
 use futures::{join, FutureExt};
 use signal_hook::consts::TERM_SIGNALS;
@@ -54,11 +54,13 @@ pub(super) trait InternalWorkerExt {
 pub(crate) struct Worker {
     registered_jobs: HashMap<String, Box<dyn Job>>,
     client: CwabClient,
+    #[allow(dead_code)]
+    config: Config,
     termination_bool: Arc<AtomicBool>,
 }
 
 impl Worker {
-    pub fn new(client: CwabClient) -> Result<Self, anyhow::Error> {
+    pub(crate) fn new(config: &Config, client: CwabClient) -> Result<Self, anyhow::Error> {
         let termination_bool = Arc::new(AtomicBool::new(false));
         for sig in TERM_SIGNALS {
             // When terminated by a second term signal, exit with exit code 1.
@@ -72,6 +74,7 @@ impl Worker {
         Ok(Worker {
             registered_jobs: HashMap::new(),
             client,
+            config: config.clone(),
             termination_bool,
         })
     }
