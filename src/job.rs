@@ -261,4 +261,15 @@ pub trait Job: Send + Sync + 'static + DynClone + std::fmt::Debug {
     }
 }
 
+#[async_trait]
+impl Job for Box<dyn Job> {
+    fn name(&self) -> &'static str {
+        self.as_ref().name()
+    }
+
+    async fn perform(&self, arg: Option<String>) -> Result<Option<String>, JobError> {
+        self.as_ref().perform(arg).await
+    }
+}
+
 dyn_clone::clone_trait_object!(Job);
