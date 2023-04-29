@@ -100,3 +100,6 @@ async fn main() -> Result<()> {
     Ok(())
 }
 ```
+
+# Contributing
+If you want to contribute, I recommend looking at our [good first issues](https://github.com/cwabcorp/cwab/contribute). Our [contributing file](.github/CONTRIBUTING.md) has some tips for getting started.
