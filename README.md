@@ -41,8 +41,10 @@ cargo install cwab
 - [x] Encryption
 - [x] Rate limiting
 - [x] Parallelism
-- [x] Web UI
 - [x] Dedicated support
+- [ ] Coming soon: Workflows (Job output fed as input to a dependent job)
+- [ ] Metrics
+- [ ] Web UI
 - [x] A commercial license
 
 ### To purchase

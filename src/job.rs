@@ -21,7 +21,7 @@ pub enum Backoff {
     /// Waits duration before retrying, then waits twice as long, then twice more, etc...
     Exponential(Duration),
 
-    /// We use the same backoff algorithm as Sidekiq: (retry_count^4) + 15 + (rand(10) * (retry_count + 1))
+    /// We use the same backoff algorithm as Sidekiq: `(retry_count^4) + 15 + (rand(10) * (retry_count + 1))`
     Default,
 }
 
