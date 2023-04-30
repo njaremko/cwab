@@ -54,6 +54,8 @@ Use the below links to purchase a commercial license. You'll receive access to C
 
 [Click this link](https://buy.stripe.com/fZeaIn7mL3GN35u9AB) to pay $995 USD yearly
 
+Two week satisfaction guarantee, or I'll give you a refund.
+
 # Documentation
 
 You can find our documentation [here](https://github.com/cwabcorp/cwab/wiki)
