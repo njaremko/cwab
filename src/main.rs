@@ -46,7 +46,7 @@ async fn main() -> Result<()> {
     let args = CwabCli::parse();
     let mut config = Config::new(args.config.as_deref())?;
     match args.command {
-        Commands::Librarian(librarian) => [match librarian {
+        Commands::Librarian(librarian) => match librarian {
             LibrarianCommands::Start { queues } => {
                 let namespaces = parse_namespaces(&config, queues);
                 println!("Starting librarian...");
@@ -56,7 +56,7 @@ async fn main() -> Result<()> {
                 let worker = cwab.worker();
                 worker.start_bookkeeping().await?;
             }
-        }],
+        },
     };
 
     Ok(())

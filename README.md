@@ -42,7 +42,6 @@ cargo install cwab
 - [x] Rate limiting
 - [x] Parallelism
 - [x] Web UI
-- [x] Metrics
 - [x] Dedicated support
 - [x] A commercial license
 
