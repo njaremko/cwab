@@ -1,6 +1,7 @@
-# 0.5.11 (unreleased)
+# 0.5.11
 
 - Add backtraces to anyhow errors
+- Documentation updates
 
 # 0.5.10
 
