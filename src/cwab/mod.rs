@@ -1,5 +1,5 @@
 use crate::client::{CwabClient, CwabClientError};
-use crate::job::{Job, JobDescription, JobError, JobId};
+use crate::job::{Job, JobError, JobId};
 use crate::prelude::{JobInput, Worker};
 use crate::worker::WorkerExt;
 use crate::Config;
@@ -50,21 +50,21 @@ impl Cwab {
 #[async_trait]
 pub trait ClientMiddleware: Send + Sync + DynClone {
     /// Transform a given job and input into another job and input
-    fn transform(
+    async fn transform(
         &self,
         from: Box<dyn Job>,
         input: Option<String>,
-    ) -> (Box<dyn Job>, Option<String>);
+    ) -> Result<(Box<dyn Job>, Option<String>), CwabError>;
 }
 
 #[async_trait]
 impl ClientMiddleware for Box<dyn ClientMiddleware> {
-    fn transform(
+    async fn transform(
         &self,
         from: Box<dyn Job>,
         input: Option<String>,
-    ) -> (Box<dyn Job>, Option<String>) {
-        self.as_ref().transform(from, input)
+    ) -> Result<(Box<dyn Job>, Option<String>), CwabError> {
+        self.as_ref().transform(from, input).await
     }
 }
 
@@ -118,18 +118,18 @@ impl CwabExtInternal for Cwab {
     }
 }
 
-fn apply_client_middleware(
+async fn apply_client_middleware(
     middleware: &[Box<dyn ClientMiddleware>],
     job: impl Job,
     input: Option<String>,
-) -> (impl Job, Option<String>) {
+) -> Result<(impl Job, Option<String>), CwabError> {
     let (mut job, mut input): (Box<dyn Job>, Option<String>) = (Box::new(job), input);
     for m in middleware.iter() {
-        let (x, y) = m.transform(job, input);
+        let (x, y) = m.transform(job, input).await?;
         job = x;
         input = y;
     }
-    (job, input)
+    Ok((job, input))
 }
 
 #[async_trait]
@@ -140,7 +140,7 @@ impl CwabExt for Cwab {
         input: Option<String>,
         duration: Duration,
     ) -> Result<JobId, CwabError> {
-        let (job, input) = apply_client_middleware(&self.middleware, job, input);
+        let (job, input) = apply_client_middleware(&self.middleware, job, input).await?;
         self.perform_at(job, input, time::OffsetDateTime::now_utc() + duration)
             .await
     }
@@ -151,7 +151,7 @@ impl CwabExt for Cwab {
         input: Option<String>,
         time: time::OffsetDateTime,
     ) -> Result<JobId, CwabError> {
-        let (job, input) = apply_client_middleware(&self.middleware, job, input);
+        let (job, input) = apply_client_middleware(&self.middleware, job, input).await?;
         let mut job_desc = job.to_job_description(self.encode_input(input));
         job_desc.at = Some(time);
         Ok(self.client.raw_push(&[job_desc]).await?[0])
@@ -162,7 +162,7 @@ impl CwabExt for Cwab {
         job: impl Job,
         input: Option<String>,
     ) -> Result<JobId, CwabError> {
-        let (job, input) = apply_client_middleware(&self.middleware, job, input);
+        let (job, input) = apply_client_middleware(&self.middleware, job, input).await?;
         let job_desc = job.to_job_description(self.encode_input(input));
         Ok(self.client.raw_push(&[job_desc]).await?[0])
     }
@@ -172,20 +172,18 @@ impl CwabExt for Cwab {
         job: impl Job + Clone,
         inputs: Vec<Option<String>>,
     ) -> Result<Vec<JobId>, CwabError> {
-        let job_desc: Vec<JobDescription> = inputs
-            .iter()
-            .map(|input| {
-                let j = job.clone();
-                let (job, input) = apply_client_middleware(&self.middleware, j, input.clone());
-                job.to_job_description(self.encode_input(input))
-            })
-            .collect();
-
-        for window in job_desc.windows(1000) {
-            self.client.raw_push(window).await?;
+        let mut results = vec![];
+        for slice in inputs.windows(1000) {
+            let mut window = vec![];
+            for input in slice {
+                let (job, input) =
+                    apply_client_middleware(&self.middleware, job.clone(), input.clone()).await?;
+                window.push(job.to_job_description(self.encode_input(input)));
+            }
+            results.append(&mut self.client.raw_push(&window).await?);
         }
 
-        Ok(job_desc.iter().map(|x| x.job_id).collect())
+        Ok(results)
     }
 
     async fn perform_sync(
@@ -193,7 +191,7 @@ impl CwabExt for Cwab {
         job: impl Job,
         input: Option<String>,
     ) -> Result<Option<String>, CwabError> {
-        let (job, input) = apply_client_middleware(&self.middleware, job, input);
+        let (job, input) = apply_client_middleware(&self.middleware, job, input).await?;
         Ok(job.perform(input).await?)
     }
 }
