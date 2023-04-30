@@ -5,6 +5,7 @@ use crate::worker::WorkerExt;
 use crate::Config;
 use async_trait::async_trait;
 use dyn_clone::DynClone;
+use itertools::Itertools;
 use r2d2::Pool;
 use std::str::Utf8Error;
 use std::time::Duration;
@@ -27,10 +28,19 @@ impl Cwab {
     pub fn new(config: &Config) -> Result<Cwab, CwabError> {
         let redis_pool: Pool<redis::Client> = establish(config)?;
         let client = CwabClient::new(redis_pool);
+
+        let mut config = config.clone();
+        let namespaces: Vec<String> = config
+            .namespaces
+            .as_ref()
+            .map(|x| x.iter().unique().cloned().collect())
+            .unwrap_or_else(|| vec!["default".to_string()]);
+        config.namespaces = Some(namespaces);
+
         Ok(Cwab {
-            config: config.clone(),
-            worker: Worker::new(config, client.clone())?,
+            worker: Worker::new(&config, client.clone())?,
             middleware: vec![],
+            config,
             client,
         })
     }

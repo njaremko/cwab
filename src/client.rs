@@ -96,6 +96,13 @@ impl CwabClient {
             Queue::Enqueued => {
                 conn.rpush(Queue::Enqueued.namespaced(&job.namespace), job)?;
             }
+            Queue::Scheduled => {
+                conn.zadd(
+                    Queue::Scheduled.namespaced(&job.namespace),
+                    job,
+                    job.at.expect("INVARIANT VIOLATED: Rescheduling a job. It should have a scheduled time!").unix_timestamp(),
+                )?;
+            }
             _ => {
                 panic!("INVARIANT VIOLATED, shouldn't be giving `retry_job_without_incrementing` another type of queue!")
             }

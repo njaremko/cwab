@@ -44,6 +44,10 @@ impl InternalWorkerExt for SimpleWorker {
         .flatten()
     }
 
+    fn config(&self) -> Config {
+        self.0.config.clone()
+    }
+
     async fn reschedule_periodic_job(&self, _job: &JobDescription) -> Result<(), anyhow::Error> {
         Ok(())
     }

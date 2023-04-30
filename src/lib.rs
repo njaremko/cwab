@@ -59,9 +59,8 @@
 //! }
 //!```
 
-use std::time::Duration;
-
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
 
 pub(crate) mod client;
 pub(crate) mod cwab;
@@ -74,14 +73,16 @@ pub mod prelude;
 
 /// Configuration used to (de)serialize a TOML configuration file.
 /// Used to customize various aspects of the runtime.
-#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq)]
 pub struct Config {
     /// Used to version the configuration format
-    version: usize,
+    pub version: usize,
     /// A `redis://...` url
-    redis_url: String,
+    pub redis_url: String,
     /// A secret used to encrypt job inputs
     secret: Option<String>,
+    /// The queue name spaces to watch
+    pub namespaces: Option<Vec<String>>,
 }
 
 impl Config {
@@ -102,10 +103,19 @@ impl Config {
                 println!("CWAB_SECRET is not set, disabling encryption");
             }
 
+            let namespaces_str = std::env::var("CWAB_NAMESPACES").ok();
+            let namespaces: Option<Vec<String>> = namespaces_str.map(|namespaces| {
+                namespaces
+                    .split(',')
+                    .map(|x| x.trim().to_string())
+                    .collect()
+            });
+
             Config {
                 version: 1,
                 redis_url,
                 secret,
+                namespaces,
             }
         };
         Ok(config)

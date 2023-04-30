@@ -39,10 +39,11 @@ pub trait WorkerExt {
 }
 
 #[async_trait]
-pub(super) trait InternalWorkerExt {
+pub(crate) trait InternalWorkerExt {
     fn read_input(&self, job_description: &JobDescription) -> Option<String>;
     async fn reschedule_periodic_job(&self, job: &JobDescription) -> Result<(), anyhow::Error>;
     fn client(&self) -> CwabClient;
+    fn config(&self) -> Config;
     async fn run_workers(
         &self,
         term_bool: Arc<AtomicBool>,
@@ -73,10 +74,24 @@ impl Worker {
             // first arm and then terminate ‒ all in the first round.
             flag::register(*sig, Arc::clone(&termination_bool))?;
         }
+
+        let config = config.clone();
+        println!(
+            "Watching namespaces: {}",
+            config
+                .namespaces
+                .as_ref()
+                .expect("INVARIANT VIOLATED: No namespaces when creating worker!")
+                .iter()
+                .cloned()
+                .reduce(|acc, x| format!("{}, {}", acc, x))
+                .expect("INVARIANT VIOLATED: No namespaces provided. Can't watch anything!")
+        );
+
         Ok(Worker {
             registered_jobs: HashMap::new(),
             client,
-            config: config.clone(),
+            config,
             termination_bool,
         })
     }
@@ -109,11 +124,13 @@ pub(super) async fn enqueue_scheduled_work<W: WorkerExt + InternalWorkerExt>(
         let current = OffsetDateTime::now_utc();
         let job_scheduled_at = job.at.expect("Got scheduled job with no timestamp!");
 
-        if !w.registered_jobs().contains_key(&job.job_type) || current < job_scheduled_at {
+        if current < job_scheduled_at {
             client.retry_job_without_incrementing(Queue::Scheduled, &job)?;
             // We wait until next scheduled job, or 5 seconds, whichever is sooner.
             let clamped_duration = std::cmp::min(
-                std::time::Duration::from_secs_f64((job_scheduled_at - current).as_seconds_f64()),
+                std::time::Duration::from_secs_f64(
+                    (job_scheduled_at - current).abs().as_seconds_f64(),
+                ),
                 MAX_WAIT,
             );
             tokio::time::sleep(clamped_duration).await;
@@ -191,11 +208,10 @@ pub(super) async fn start_bookkeeping<
     let term_now = w.term_bool();
     let worker = Arc::new(w);
 
-    let namespaces: HashSet<&'static str> = worker
-        .registered_jobs()
-        .values()
-        .map(|v| v.queue())
-        .collect();
+    let namespaces: Vec<String> = worker
+        .config()
+        .namespaces
+        .unwrap_or_else(|| vec!["default".to_string()]);
 
     let heartbeat_client = worker.client();
     let loop_term = term_now.clone();
@@ -374,7 +390,7 @@ async fn wrapped_platform<W: WorkerExt + InternalWorkerExt>(
     heartbeat.abort();
 
     match result {
-        Ok(success) => success.map_err(|e| JobError::AnyError(e.into())),
+        Ok(success) => success.map_err(JobError::AnyError),
         Err(panic) => Err(JobError::PanicError {
             panic: format!("{:?}", panic),
         }),
@@ -400,7 +416,15 @@ pub(crate) async fn do_work<W: WorkerExt + InternalWorkerExt>(
         }
         Err(e) => {
             let mut new_job = job_description.as_ref().clone();
-            new_job.error_message = Some(format!("{:?}", e));
+            new_job.error_message = Some(format!("{}", e));
+            println!(
+                "Job {} failed with error: {}",
+                &new_job.job_id,
+                &new_job
+                    .error_message
+                    .as_ref()
+                    .expect("INVARIANT VIOLATED: Error message must exist here.")
+            );
             if job_description.retry_policy.is_some() {
                 w.client()
                     .change_status(&new_job, Queue::Retrying)

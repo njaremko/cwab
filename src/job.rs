@@ -4,6 +4,7 @@ use dyn_clone::DynClone;
 use redis::ToRedisArgs;
 use redis::{from_redis_value, FromRedisValue};
 use serde::{Deserialize, Serialize};
+
 use std::fmt::Display;
 use std::hash::Hash;
 use std::str::FromStr;
@@ -98,7 +99,7 @@ impl FromStr for Queue {
 #[derive(Error, Debug)]
 pub enum JobError {
     /// A string wrapper for panics that occur
-    #[error("A panic occurred in the job")]
+    #[error("A panic occurred in the job: {}", .panic)]
     PanicError { panic: String },
     /// This is a thin wrapper around `anyhow::Error` to allow us to swap out the underlying error type someday, if needed
     #[error(transparent)]

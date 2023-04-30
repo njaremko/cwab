@@ -13,7 +13,10 @@ pub enum Commands {
 #[derive(Subcommand, Debug)]
 pub enum LibrarianCommands {
     #[command(about = "Start the librarian")]
-    Start,
+    Start {
+        #[arg(long, default_value = None)]
+        queues: Option<String>,
+    },
 }
 
 /// CwabCli parser struct
@@ -26,16 +29,31 @@ struct CwabCli {
     pub config: Option<String>,
 }
 
+fn parse_namespaces(config: &Config, queues: Option<String>) -> Vec<String> {
+    if let Some(queues) = queues {
+        queues.split(',').map(|x| x.trim().to_string()).collect()
+    } else {
+        // Default to watching 'default'
+        config
+            .namespaces
+            .clone()
+            .unwrap_or_else(|| vec!["default".to_string()])
+    }
+}
+
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = CwabCli::parse();
-    let config = Config::new(args.config.as_deref())?;
+    let mut config = Config::new(args.config.as_deref())?;
     match args.command {
         Commands::Librarian(librarian) => [match librarian {
-            LibrarianCommands::Start => {
+            LibrarianCommands::Start { queues } => {
+                let namespaces = parse_namespaces(&config, queues);
+                println!("Starting librarian...");
+                config.namespaces = Some(namespaces);
+
                 let cwab = Cwab::new(&config)?;
                 let worker = cwab.worker();
-                println!("Starting librarian...");
                 worker.start_bookkeeping().await?;
             }
         }],
