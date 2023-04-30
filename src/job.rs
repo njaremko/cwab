@@ -146,6 +146,8 @@ pub struct JobDescription {
     pub created_at: OffsetDateTime,
     /// When the job was added to the work queue
     pub enqueued_at: Option<OffsetDateTime>,
+    /// If an error happens, we store it here when retrying / moving to morgue
+    pub error_message: Option<String>,
 }
 
 impl JobDescription {
@@ -266,6 +268,7 @@ pub trait Job: Send + Sync + 'static + DynClone + std::fmt::Debug {
             period: None,
             created_at: now,
             enqueued_at: None,
+            error_message: None,
         }
     }
 }

@@ -392,24 +392,25 @@ pub(crate) async fn do_work<W: WorkerExt + InternalWorkerExt>(
 
     let result = wrapped_platform(w, &job_description, job_input).await;
 
-    let handle_error = || {
-        if job_description.retry_policy.is_some() {
-            w.client()
-                .change_status(&job_description, Queue::Retrying)
-                .expect("INVARIANT VIOLATED: Failed to change status");
-        } else {
-            w.client()
-                .change_status(&job_description, Queue::Dead)
-                .expect("INVARIANT VIOLATED: Failed to change status");
-        }
-    };
     match &result {
         Ok(_job_output) => {
             w.client()
                 .change_status(&job_description, Queue::Processed)
                 .expect("INVARIANT VIOLATED: Failed to change status");
         }
-        Err(_) => handle_error(),
+        Err(e) => {
+            let mut new_job = job_description.as_ref().clone();
+            new_job.error_message = Some(format!("{:?}", e));
+            if job_description.retry_policy.is_some() {
+                w.client()
+                    .change_status(&new_job, Queue::Retrying)
+                    .expect("INVARIANT VIOLATED: Failed to change status");
+            } else {
+                w.client()
+                    .change_status(&new_job, Queue::Dead)
+                    .expect("INVARIANT VIOLATED: Failed to change status");
+            }
+        }
     }
     Ok(())
 }
