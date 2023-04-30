@@ -59,5 +59,7 @@ Two week satisfaction guarantee, or I'll give you a refund.
 
 You can find our documentation [here](https://github.com/cwabcorp/cwab/wiki)
 
+Library documentation can be found on [docs.rs](https://docs.rs/cwab/latest/cwab/)
+
 # Contributing
 If you want to contribute, I recommend looking at our [good first issues](https://github.com/cwabcorp/cwab/contribute). Our [contributing file](.github/CONTRIBUTING.md) has some tips for getting started.

@@ -105,12 +105,6 @@ pub enum JobError {
     AnyError(#[from] anyhow::Error),
 }
 
-// impl<E: Into<anyhow::Error>> From<E> for JobError {
-//     fn from(value: E) -> Self {
-//         JobError::AnyError(value.into())
-//     }
-// }
-
 /// The randomly generated ID for a given instance of a job
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct JobId(Uuid);
