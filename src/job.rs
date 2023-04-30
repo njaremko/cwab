@@ -4,7 +4,6 @@ use dyn_clone::DynClone;
 use redis::ToRedisArgs;
 use redis::{from_redis_value, FromRedisValue};
 use serde::{Deserialize, Serialize};
-
 use std::fmt::Display;
 use std::hash::Hash;
 use std::str::FromStr;
