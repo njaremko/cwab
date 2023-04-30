@@ -105,6 +105,12 @@ pub enum JobError {
     AnyError(#[from] anyhow::Error),
 }
 
+// impl<E: Into<anyhow::Error>> From<E> for JobError {
+//     fn from(value: E) -> Self {
+//         JobError::AnyError(value.into())
+//     }
+// }
+
 /// The randomly generated ID for a given instance of a job
 #[derive(Serialize, Deserialize, Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct JobId(Uuid);
@@ -212,7 +218,7 @@ pub trait Job: Send + Sync + 'static + DynClone + std::fmt::Debug {
     fn name(&self) -> &'static str;
 
     /// Given input, do some work
-    async fn perform(&self, _: Option<String>) -> Result<Option<String>, JobError>;
+    async fn perform(&self, _: Option<String>) -> Result<Option<String>, anyhow::Error>;
 
     /// The queue namespace to run on. Defaults to `"default"`
     fn queue(&self) -> &'static str {
@@ -279,7 +285,7 @@ impl Job for Box<dyn Job> {
         self.as_ref().name()
     }
 
-    async fn perform(&self, arg: Option<String>) -> Result<Option<String>, JobError> {
+    async fn perform(&self, arg: Option<String>) -> Result<Option<String>, anyhow::Error> {
         self.as_ref().perform(arg).await
     }
 }

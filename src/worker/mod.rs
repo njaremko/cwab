@@ -374,7 +374,7 @@ async fn wrapped_platform<W: WorkerExt + InternalWorkerExt>(
     heartbeat.abort();
 
     match result {
-        Ok(success) => success,
+        Ok(success) => success.map_err(|e| JobError::AnyError(e.into())),
         Err(panic) => Err(JobError::PanicError {
             panic: format!("{:?}", panic),
         }),
