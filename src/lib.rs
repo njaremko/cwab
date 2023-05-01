@@ -54,8 +54,8 @@
 //!     cwab.perform_async(HelloJob, Some("Bob".to_string()))
 //!         .await?;
 //!
-//!     // You should await this, I can't here, because doctests would fail...
-//!     worker.start_working();
+//!     // You should uncomment this, it's commented because the test wouldn't end...
+//!     // worker.start_working().await?;
 //!     Ok(())
 //! }
 //!```
