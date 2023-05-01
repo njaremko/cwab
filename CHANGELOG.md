@@ -1,3 +1,6 @@
+# 0.5.12
+- Just fixing documentation in the rustdocs
+
 # 0.5.11
 
 - Add backtraces to anyhow errors
