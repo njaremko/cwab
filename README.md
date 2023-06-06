@@ -18,7 +18,7 @@ Correct, efficient, and simple. Lets process some jobs.
 # Installation
 The `cwab` library is installed by adding the following to your `Cargo.toml`
 ```toml
-cwab = "^0.5"
+cwab = "^0.6"
 ```
 
 You'll also need to run the following to install the CLI
@@ -32,8 +32,6 @@ cargo install cwab
 - [x] Scheduled jobs
 - [x] An easy to use Rust API
 - [x] Middleware support
-
-# Paid Features
 - [x] Batched jobs
 - [x] Cron support
 - [x] Expiring jobs
@@ -41,10 +39,12 @@ cargo install cwab
 - [x] Encryption
 - [x] Rate limiting
 - [x] Parallelism
+
+# Paid Features
 - [x] Dedicated support
-- [ ] Coming soon: Workflows (Job output fed as input to a dependent job)
-- [ ] Metrics
-- [ ] Web UI
+- [x] Workflows (Job output fed as input to a dependent job)
+- [x] Metrics
+- [x] Web UI
 - [x] A commercial license
 
 ### To purchase

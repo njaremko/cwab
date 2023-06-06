@@ -1,3 +1,5 @@
+pub mod pro;
+
 use crate::client::{CwabClient, CwabClientError};
 use crate::job::{Job, JobError, JobId};
 use crate::prelude::{JobInput, Worker};

@@ -1,3 +1,12 @@
+# 0.6.0
+- [x] Batched jobs
+- [x] Cron support
+- [x] Expiring jobs
+- [x] Unique jobs
+- [x] Encryption
+- [x] Rate limiting
+- [x] Parallelism
+
 # 0.5.12
 - Just fixing documentation in the rustdocs
 

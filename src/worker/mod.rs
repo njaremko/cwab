@@ -1,4 +1,4 @@
-pub mod simple;
+pub mod pro;
 
 use crate::client::CwabClient;
 use crate::prelude::{
@@ -54,7 +54,7 @@ pub(crate) trait InternalWorkerExt {
 }
 
 #[derive(Clone, Debug)]
-pub(crate) struct Worker {
+pub(crate) struct WorkerState {
     registered_jobs: HashMap<String, Box<dyn Job>>,
     client: CwabClient,
     #[allow(dead_code)]
@@ -62,7 +62,7 @@ pub(crate) struct Worker {
     termination_bool: Arc<AtomicBool>,
 }
 
-impl Worker {
+impl WorkerState {
     pub(crate) fn new(config: &Config, client: CwabClient) -> Result<Self, anyhow::Error> {
         let termination_bool = Arc::new(AtomicBool::new(false));
         for sig in TERM_SIGNALS {
@@ -88,7 +88,7 @@ impl Worker {
                 .expect("INVARIANT VIOLATED: No namespaces provided. Can't watch anything!")
         );
 
-        Ok(Worker {
+        Ok(WorkerState {
             registered_jobs: HashMap::new(),
             client,
             config,
