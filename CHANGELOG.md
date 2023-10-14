@@ -1,3 +1,7 @@
+# 0.6.2
+
+- Just updating the readme
+
 # 0.6.1
 
 - Refactoring to make exposed API cleaner

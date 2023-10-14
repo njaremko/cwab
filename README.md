@@ -29,7 +29,7 @@ You'll also need to run the following to install the CLI
 cargo install cwab
 ```
 
-# Free Features
+# Features
 
 - [x] Reliable job dispatch
 - [x] Error handling with retries
