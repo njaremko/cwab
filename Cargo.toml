@@ -1,10 +1,10 @@
 [package]
 name = "cwab"
 authors = ["Nathan Jaremko <nathan@jaremko.ca>"]
-version = "0.6.0"
+version = "0.6.1"
 edition = "2021"
 description = "A correct, efficient, and simple job processor"
-license = "LGPL-3.0"
+license = "Apache-2.0"
 readme = "README.md"
 keywords = ["job", "processor", "queue", "worker", "background"]
 repository = "https://github.com/cwabcorp/cwab"
@@ -28,7 +28,7 @@ futures = "^0.3.0"
 futures-util = "^0.3.25"
 pbkdf2 = "^0.12.1"
 r2d2 = "^0.8.0"
-itertools = "^0.10.5"
+itertools = "^0.11.0"
 rand = "^0.8.0"
 redis = { version = "^0.23.0", features = [
     "r2d2",
@@ -44,5 +44,5 @@ tempfile = "^3.3.0"
 thiserror = "^1.0.40"
 time = { version = "^0.3", features = ["serde"] }
 tokio = { version = "1.24.2", features = ["full"] }
-toml = "^0.7.3"
+toml = "^0.8.2"
 uuid = { version = "^1", features = ["v4", "serde"] }

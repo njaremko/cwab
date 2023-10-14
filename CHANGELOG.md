@@ -1,4 +1,9 @@
+# 0.6.1
+
+- Refactoring to make exposed API cleaner
+
 # 0.6.0
+
 - [x] Batched jobs
 - [x] Cron support
 - [x] Expiring jobs
@@ -8,6 +13,7 @@
 - [x] Parallelism
 
 # 0.5.12
+
 - Just fixing documentation in the rustdocs
 
 # 0.5.11
@@ -34,11 +40,13 @@
 - Changed registering jobs to not return a result. It can't fail.
 
 # 0.5.2
+
 - Published the `ClientMiddleware` trait
 
 # 0.5.0
 
 ### Launching Cwab Pro
+
 - [x] Batched jobs
 - [x] Cron support
 - [x] Expiring jobs
